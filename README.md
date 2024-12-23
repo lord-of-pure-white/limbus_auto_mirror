@@ -11,7 +11,11 @@
 ## 1.部署
 
 需要安装python，版本为3.12.*,并设置合适的镜像源
-
+下载:https://www.python.org/ftp/python/3.12.8/python-3.12.8-amd64.exe
+镜像源设置:
+```
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+```
 需要下载三方库，三方库依赖在requests.txt中
 
 在本项目文件夹下打开终端，通过
@@ -20,15 +24,15 @@
 pip install -r requirements.txt
 ```
 
-快速安装
+安装
 
-(有条件的话paddle可以装gpu版本的)
+(有条件的话paddle可以装gpu版本的，cpu版本的用ocr会比较慢，但是gpu版本的装起来太麻烦了)
 
 ## 2.配置和使用
 
 记事本或者其他方式打开config.py（后续可能会修改配置方式）。按照注释修改配置。
 
-终端里通过
+目录下打开终端，通过
 
 ```
 python event.py
@@ -46,5 +50,5 @@ python event.py
 
 游戏需要配置窗口化，分辨率1600*900，画质全开高。
 
-遇到bug可以提issue反馈。
+遇到bug可以提issue反馈，偶尔会看，有空会改。
 
