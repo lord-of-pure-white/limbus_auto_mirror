@@ -573,7 +573,7 @@ class ShopBuyEgoSolver(Solver):
                 
                 found, loc0, _ = self.monitor.new_find('ego_get')
                 if not found:
-                    found, loc0, _ = self.monitor.find('buy_stop')
+                    found, loc0, _ = self.monitor.find('stop_buy')
                     move_and_click(loc0)
                 else:
                     move_and_click(loc0)
