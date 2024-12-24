@@ -776,7 +776,7 @@ class ResultSolver(Solver):
         datas_fixed.append({'text':text,'loc':loc})
         return datas_fixed
     def choose_gift(self):
-        time.sleep(0.3)
+        time.sleep(1)
         self.monitor.refresh()
         top_left = (200,440)
         datas = self.monitor.ocr(range=(top_left,(1500,540)))
