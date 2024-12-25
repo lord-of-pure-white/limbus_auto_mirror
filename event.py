@@ -174,8 +174,8 @@ class EventSolver(Solver):
         super().__init__(monitor)
         self.retry = 0
         self.checker = EventChecker(self.monitor)
-        self.priority0 = EVENT_priority0
-        self.priority1 = EVENT_priority1
+        self.priority0 = EVENT_PRIORITY0
+        self.priority1 = EVENT_PRIORITY1
 
     def to_choose_judger(self):
         # 选择判定人物，选择其中成功率最高的
@@ -297,13 +297,16 @@ class RouteChecker(Checker):
         return self.monitor.find('route_goto')[0]
     def is_on_way(self):
         return self.monitor.find('out_fight')[0] and self.monitor.find('on_way')[0]
-    
+    def net_error(self):
+        return self.monitor.find('net_error')[0]
     def check_status(self):
         for _ in range(8):
             super().check_screen()
             if self.window_status != 'dead':
                 if self.is_goto():
                     return 'goto'
+                elif self.net_error():
+                    return 'net_error'
                 elif self.is_on_way():
                     return 'on_way'
                 else:
@@ -379,7 +382,9 @@ class RouteSolver(Solver):
                 return False
             status = self.checker.check_status()
             print(status)
-            if status == 'on_way':
+            if status == 'net_error':
+                return True
+            elif status == 'on_way':
                 self.chose_route()
             elif status == 'goto':
                 self.to_goto()
@@ -629,8 +634,7 @@ class ShopSkillSolver(Solver):
                     return True
 
         while True:
-            self.monitor.refresh()
-            found,loc,_= self.monitor.find('stop_buy')
+            found,loc,_= self.monitor.new_find('stop_buy')
             if not found:
                 return True
             else:
@@ -680,9 +684,9 @@ class ShopSolver(Solver):
         self.shop_refresh_times = self.get_shop_refresh_times()
         self.shop_act_list = self.get_shop_acts()
     def get_shop_refresh_times(self):
-        return SHOP_refresh
+        return SHOP_REFRESH
     def get_shop_acts(self):
-        return SHOP_priority
+        return SHOP_PRIORITY
     def shop_run(self):
         for act in self.shop_act_list:
             if act == 'skill':
@@ -699,10 +703,13 @@ class ShopSolver(Solver):
     def out_shop(self):
         return 
     def refresh_shop(self):
-        _, loc, _ = self.monitor.find('shop_refresh')
+        found, loc, _ = self.monitor.find('shop_refresh')
+        if not found:
+            return False
         move_and_click(loc)
         super().move_free()
         time.sleep(0.5)
+        return True
     def quit_shop(self):
         _, loc, _ = self.monitor.find('out_shop')
         move_and_click(loc)
@@ -722,7 +729,8 @@ class ShopSolver(Solver):
                 r = self.shop_run()
                 if r:
                     for _ in range(self.shop_refresh_times):
-                        self.refresh_shop()
+                        if not self.refresh_shop():
+                            break
                         self.monitor.refresh()
                         r = self.shop_run()
                         if not r:
@@ -742,7 +750,7 @@ class ResultSolver(Solver):
         self.checker = ResultChecker(self.monitor)
         self.gift_priority = self.get_gift_priority()
     def get_gift_priority(self):
-        return GIFT_priority
+        return GIFT_PRIORITY
     def confirm_ego(self):
         _,loc,_ = self.monitor.find('get_ego')
         loc = Loc(loc) + Loc(-30,100)
@@ -983,9 +991,9 @@ class IntoMirrorSolver(Solver):
         self.buff_selected = self.get_buff_list()
         self.start_ego = self.get_start_ego()
     def get_buff_list(self):
-        return STAR_buff_list
+        return STAR_BUFFS
     def get_start_ego(self):
-        return START_ego
+        return START_EGO
     def into_select(self):
         _,loc,_ = self.monitor.find('in_main')
         move_and_click(loc)
