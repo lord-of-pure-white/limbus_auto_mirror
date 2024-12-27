@@ -4,14 +4,24 @@ from config import OCR_ENGINE
 import numpy as np
 import logging
 
+def timer(func):
+    def wrapper(*args, **kwargs):
+        t1 = time.time()
+        result = func(*args, **kwargs)
+        t2 = time.time()
+        print('ocr耗时:{}s'.format(t2-t1))
+        return result
+    return wrapper
+
+
 
 print(f"{OCR_ENGINE=}")
 if OCR_ENGINE == 'PaddleOCR':
     from paddleocr import PaddleOCR, draw_ocr
     logging.getLogger('ppocr').setLevel(logging.ERROR)
     ocr = PaddleOCR(use_angle_cls=True, lang='ch')
+    @timer
     def img_ocr(img):
-        t1 = time.time()
         result = ocr.ocr(img)
         data_list = []
         for data in result:
@@ -22,14 +32,13 @@ if OCR_ENGINE == 'PaddleOCR':
                         text = line[1][0]
                         confidence = line[1][1]
                         data_list.append({'loc':loc,'text':text,'confidence':confidence})
-        t2 = time.time()
-        print('ocr耗时:{}s'.format(t2-t1))
         return data_list
 
 
 if OCR_ENGINE == 'PP_OCR_V3':
     import paddlehub as hub
     ocr = hub.Module(name="ch_pp-ocrv3", enable_mkldnn=True)
+    @timer
     def img_ocr(img):
         img0 = np.stack((img, img, img), axis=-1)
         result = ocr.recognize_text(images=[img0])
@@ -41,6 +50,7 @@ if OCR_ENGINE == 'PP_OCR_V3':
 if OCR_ENGINE == 'EASYOCR':
     import easyocr
     reader = easyocr.Reader(['ch_sim', 'en'])
+    @timer
     def img_ocr(img):
         result = reader.readtext(img)
         data_list = []
@@ -54,8 +64,5 @@ if OCR_ENGINE == 'EASYOCR':
 
 
 if __name__ == "__main__":
-    for _ in range(10):
-        s_time = time.time()
-        img = cv2.imread('test0000.png',cv2.IMREAD_GRAYSCALE)
-        print(img_ocr(img))
-        print('耗时:{}'.format(time.time()-s_time))
+    img = cv2.imread('test0000.png',cv2.IMREAD_GRAYSCALE)
+    print(img_ocr(img))

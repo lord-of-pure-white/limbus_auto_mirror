@@ -1,6 +1,7 @@
 # 配置文件
 # 选择调用的ocr引擎，推荐PaddleOCR
 OCR_ENGINE = 'PaddleOCR' # choose in "PaddleOCR","PP_OCR_V3","EASYOCR"
+# OCR_ENGINE = 'PP_OCR_V3'
 
 # 事件优先级，EVENT_priority0是第一顺序，EVENT_priority1是第二顺序
 # 'judge' 是判定，'fight'是战斗，'normal'是其他类型
@@ -29,8 +30,14 @@ GIFT_PRIORITY = ['经费ego','ego','经费','罪孽碎片']
 # 选择卡包时需要避开的卡包(避免翻车，目前脚本翻车会停掉),不一定是全名（因为ocr有时候会识别错误，遇到选错的情况用能够识别出来的部分就行）
 BADCARDS = ['斩切者们','紫罗兰的正午','徒劳的怠','快车谋杀','肉斩骨断','压抑的暴怒','号线','空转的','于情感沉','落花']
 
+# 选择卡包时优先选择的卡包
+GOODCARDS = ['区的奇迹']
+
+# 尝试寻找优先选择的卡包时的刷新次数
+CARD_REFRESH = 3
+
 # 选择的星之恩惠 
-STAR_BUFFS = [1,2,7]
+STAR_BUFFS = [3,7]
 
 # 选择的初始ego
 START_EGO = ('流血',[1])

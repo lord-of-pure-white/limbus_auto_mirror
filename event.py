@@ -878,18 +878,35 @@ class CardChooseSolver(Solver):
         self.retry = 0
         self.checker = CardChooseChecker(self.monitor)
         self.bad_cards = self.get_bad_cards()
+        self.good_cards = self.get_good_cards()
+        self.card_refresh = self.get_refresh_times()
     def get_bad_cards(self):
         return BADCARDS
+    def get_good_cards(self):
+        return GOODCARDS
+    def get_refresh_times(self):
+        return CARD_REFRESH
+    def refresh_cards(self):
+        _,loc,_ = self.monitor.new_find('card_refresh')
+        move_and_click(loc)
+        time.sleep(3)
     def choose_card(self):
-        super().move_free()
-        self.monitor.refresh()
-        top_left = (240,550)
-        datas = self.monitor.ocr(range=(top_left,(1540,670)))
-        print([x.get('text') for x in datas])
-        filtered = [x for x in datas if all(y not in x.get('text') for y in self.bad_cards)]
-        print(filtered)
-        if filtered:
-            choice = random.choice(filtered)
+        for _ in range(self.card_refresh):
+            super().move_free()
+            self.monitor.refresh()
+            top_left = (240,540)
+            datas = self.monitor.ocr(range=(top_left,(1540,610)))
+            print([x.get('text') for x in datas])
+            filtered_good = [x for x in datas if any(y in x.get('text') for y in self.good_cards)]
+            filtered_bad = [x for x in datas if all(y not in x.get('text') for y in self.bad_cards)]
+            if filtered_good:
+                break
+            else:
+                self.refresh_cards()
+        if filtered_good:
+            choice = random.choice(filtered_good)
+        elif filtered_bad:
+            choice = random.choice(filtered_bad)
         else:
             choice = random.choice(datas)
         loc = Loc(choice.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
@@ -1192,10 +1209,13 @@ class EndSolver(Solver):
         move_and_click(loc)
         super().move_free()
         time.sleep(2)
-        _,loc,_ = self.monitor.new_find('end_mirror4')
-        move_and_click(loc)
-        super().move_free()
-        time.sleep(4)
+        while True:
+            found,loc,_ = self.monitor.new_find('end_mirror4')
+            if not found:
+                break
+            move_and_click(loc)
+            super().move_free()
+            time.sleep(4)
         return True
     def run(self):
         while True:
