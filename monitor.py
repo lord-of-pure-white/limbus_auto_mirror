@@ -46,7 +46,7 @@ class WindowMonitor:
             range = [(0,0)]
         locs = [(Loc(x) + self.window_loc + range[0]).to_tuple() for x in match_template_all(self.screen,file_path,min_distance,**kwargs)]
         return locs
-    def ocr(self,range=None):
+    def ocr(self,range=None,preprocess=None):
         # range like ((x1,y1),(x2,y2))，左上和右下
         # 去掉标题
         img = self.screen[self.title_height:,:]
@@ -54,6 +54,8 @@ class WindowMonitor:
             img = img[range[0][1]:range[1][1],range[0][0]:range[1][0]]
         else:
             pass
+        if preprocess:
+            img = preprocess(img)
         return img_ocr(img)
     def new_find(self,obj,range=None,**kwargs):
         self.refresh()

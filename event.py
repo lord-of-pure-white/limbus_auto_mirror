@@ -869,6 +869,12 @@ class ResultChecker(Checker):
                 return 'dead'
         return 'error_process'
 
+def card_choose_preprocess(gray_img):
+    alpha = 1.5  # 对比度
+    beta = 50    # 亮度
+    result_img = cv2.convertScaleAbs(gray_img, alpha=alpha, beta=beta)
+    return result_img
+
 class CardChooseSolver(Solver):
     """
     卡包选择
@@ -894,8 +900,8 @@ class CardChooseSolver(Solver):
         for _ in range(self.card_refresh):
             super().move_free()
             self.monitor.refresh()
-            top_left = (240,540)
-            datas = self.monitor.ocr(range=(top_left,(1540,610)))
+            top_left = (240,555)
+            datas = self.monitor.ocr(range=(top_left,(1450,590)),preprocess=card_choose_preprocess)
             print([x.get('text') for x in datas])
             filtered_good = [x for x in datas if any(y in x.get('text') for y in self.good_cards)]
             filtered_bad = [x for x in datas if all(y not in x.get('text') for y in self.bad_cards)]
