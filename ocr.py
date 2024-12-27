@@ -3,6 +3,7 @@ import time
 from config import OCR_ENGINE
 import numpy as np
 import logging
+import os
 
 def timer(func):
     def wrapper(*args, **kwargs):
@@ -13,13 +14,22 @@ def timer(func):
         return result
     return wrapper
 
-
+def save_img(func):
+    def wrapper(*args, **kwargs):
+        img = args[0]
+        result = func(*args, **kwargs)
+        saving_fn = os.path.join('debug_img',str(int(time.time()))+'.png')
+        cv2.imwrite(saving_fn, img)
+        return result
+    return wrapper
 
 print(f"{OCR_ENGINE=}")
 if OCR_ENGINE == 'PaddleOCR':
     from paddleocr import PaddleOCR, draw_ocr
     logging.getLogger('ppocr').setLevel(logging.ERROR)
     ocr = PaddleOCR(use_angle_cls=True, lang='ch')
+    
+    # @save_img
     @timer
     def img_ocr(img):
         result = ocr.ocr(img)
@@ -64,5 +74,8 @@ if OCR_ENGINE == 'EASYOCR':
 
 
 if __name__ == "__main__":
-    img = cv2.imread('test0000.png',cv2.IMREAD_GRAYSCALE)
-    print(img_ocr(img))
+    # img = cv2.imread('test0000.png',cv2.IMREAD_GRAYSCALE)
+    # print(img_ocr(img))
+    # img = cv2.imread('debug_img/1735283677.png',cv2.IMREAD_GRAYSCALE)
+    # print(img_ocr(img))
+    pass

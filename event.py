@@ -869,12 +869,12 @@ class ResultChecker(Checker):
                 return 'dead'
         return 'error_process'
 
-def card_choose_preprocess(gray_img):
-    alpha = 1.5  # 对比度
-    beta = 50    # 亮度
-    result_img = cv2.convertScaleAbs(gray_img, alpha=alpha, beta=beta)
-    return result_img
-
+# def card_choose_preprocess(gray_img):
+#     alpha = 1.5  # 对比度
+#     beta = 50    # 亮度
+#     result_img = cv2.convertScaleAbs(gray_img, alpha=alpha, beta=beta)
+#     return result_img
+card_choose_preprocess=None
 class CardChooseSolver(Solver):
     """
     卡包选择
@@ -886,6 +886,9 @@ class CardChooseSolver(Solver):
         self.bad_cards = self.get_bad_cards()
         self.good_cards = self.get_good_cards()
         self.card_refresh = self.get_refresh_times()
+        self.event_card = self.get_event_card()
+    def get_event_card(self):
+        return EVENT_CARD
     def get_bad_cards(self):
         return BADCARDS
     def get_good_cards(self):
@@ -895,27 +898,64 @@ class CardChooseSolver(Solver):
     def refresh_cards(self):
         _,loc,_ = self.monitor.new_find('card_refresh')
         move_and_click(loc)
-        time.sleep(3)
-    def choose_card(self):
-        for _ in range(self.card_refresh):
-            super().move_free()
-            self.monitor.refresh()
-            top_left = (240,555)
-            datas = self.monitor.ocr(range=(top_left,(1450,590)),preprocess=card_choose_preprocess)
-            print([x.get('text') for x in datas])
-            filtered_good = [x for x in datas if any(y in x.get('text') for y in self.good_cards)]
-            filtered_bad = [x for x in datas if all(y not in x.get('text') for y in self.bad_cards)]
-            if filtered_good:
-                break
-            else:
-                self.refresh_cards()
-        if filtered_good:
-            choice = random.choice(filtered_good)
-        elif filtered_bad:
-            choice = random.choice(filtered_bad)
+        super().move_free()
+        time.sleep(6)
+    def select_card(self):
+        # 卡包选择逻辑，优先选活动，其次选想要的，然后避开不想选的，最后随机选
+        normal_pass = False
+        if self.event_card:
+            event_pass = True
+            good_pass = False
+            bad_pass = False
+        elif self.good_cards:
+            event_pass = True
+            good_pass = True
+            bad_pass = False
+        elif self.bad_cards:
+            event_pass = True
+            good_pass = True
+            bad_pass = True
         else:
-            choice = random.choice(datas)
-        loc = Loc(choice.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
+            normal_pass = False
+
+        if self.event_card:
+            for card in self.event_card:
+                found,loc,_ = self.monitor.new_find(card)
+                if found:
+                    print(card)
+                    return event_pass,loc
+        self.monitor.refresh()
+        top_left = (240,550)
+        datas = self.monitor.ocr(range=(top_left,(1540,640)),preprocess=card_choose_preprocess)
+        print([x.get('text') for x in datas])
+        filtered_good = [x for x in datas if any(y in x.get('text') for y in self.good_cards)]
+        filtered_bad = [x for x in datas if all(y not in x.get('text') for y in self.bad_cards)]
+        if filtered_good:
+            r = random.choice(filtered_good)
+            loc = Loc(r.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
+            return good_pass,loc.to_tuple()
+        elif filtered_bad:
+            r = random.choice(filtered_bad)
+            loc = Loc(r.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
+            return bad_pass,loc.to_tuple()
+        else:
+            r = random.choice(datas)
+            loc = Loc(r.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
+            return normal_pass
+
+
+    def choose_card(self):
+        time.sleep(3)
+        is_ok,loc =  self.select_card()
+        if is_ok:
+            pass
+        else:
+            for _ in range(self.card_refresh):
+                self.refresh_cards()
+                is_ok,loc =  self.select_card()
+                if is_ok:
+                    break
+        loc = Loc(loc)
         mouse_drag([loc.to_tuple(),(loc+Loc(0,300)).to_tuple()])
         time.sleep(4)
         found,_,_ = self.monitor.new_find('choosing_card')
