@@ -151,6 +151,10 @@ class EventChecker(Checker):
             if self.window_status != 'dead':
                 if self.is_continue():
                     return 'continue'
+                # else:
+                #     print(11111)
+                # if True:
+                #     pass
                 elif self.is_into_juge():
                     return 'start_juge'
                 elif self.is_judge():
@@ -941,7 +945,7 @@ class CardChooseSolver(Solver):
         else:
             r = random.choice(datas)
             loc = Loc(r.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
-            return normal_pass
+            return normal_pass,loc.to_tuple()
 
 
     def choose_card(self):
