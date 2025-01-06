@@ -34,13 +34,13 @@ BADCARDS = ['斩切者们','紫罗兰的正午','徒劳的怠','快车谋杀','�
 GOODCARDS = []
 
 # 选择活动卡包
-EVENT_CARD = ['event_card_chris']
+EVENT_CARD = []
 
 # 尝试寻找优先选择的卡包时的刷新次数
-CARD_REFRESH = 3
+CARD_REFRESH = 0
 
 # 选择的星之恩惠 
-STAR_BUFFS = [3,7]
+STAR_BUFFS = [1,2,7]
 
 # 选择的初始ego
 START_EGO = ('流血',[1])

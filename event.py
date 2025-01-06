@@ -891,6 +891,20 @@ class CardChooseSolver(Solver):
         self.good_cards = self.get_good_cards()
         self.card_refresh = self.get_refresh_times()
         self.event_card = self.get_event_card()
+        self.card_count = self.get_card_count()
+    def get_card_count(self):
+        star_buff_spend = {1:10,2:10,3:20,4:20,5:30,6:30,7:40,8:40,9:50,10:60}
+        default_star = 60
+        ava_buff = []
+        for x in STAR_BUFFS:
+            default_star -= star_buff_spend.get(x)
+            if default_star >= 0:
+                ava_buff.append(x)
+            else:
+                break
+        ct = 3+len([x for x in ava_buff if x in {1,3}])
+        print(f'ct:{ct}')
+        return ct
     def get_event_card(self):
         return EVENT_CARD
     def get_bad_cards(self):
@@ -929,22 +943,36 @@ class CardChooseSolver(Solver):
                     print(card)
                     return event_pass,loc
         self.monitor.refresh()
-        top_left = (240,550)
-        datas = self.monitor.ocr(range=(top_left,(1540,640)),preprocess=card_choose_preprocess)
-        print([x.get('text') for x in datas])
-        filtered_good = [x for x in datas if any(y in x.get('text') for y in self.good_cards)]
-        filtered_bad = [x for x in datas if all(y not in x.get('text') for y in self.bad_cards)]
+        card_locs = []
+        # 最左边的第一个卡包位置
+        left = 800 - int((self.card_count-1)/2*265)
+        card_locs = [left + 265*(x) for x in range(self.card_count)]
+
+        print(card_locs)
+        results = []
+        for x in card_locs:
+            print(((x-100,550),(x+100,600)))
+            data = self.monitor.ocr(range=((x-100,550),(x+100,600)),preprocess=card_choose_preprocess)
+            print(data)
+            if len(data)==1:
+                card_name = data[0]['text']
+                results.append({'loc':(x,450),'card':card_name})
+            else:
+                continue
+        print(results)
+        filtered_good = [x for x in results if any(y in x.get('card') for y in self.good_cards)]
+        filtered_bad = [x for x in results if all(y not in x.get('card') for y in self.bad_cards)]
         if filtered_good:
             r = random.choice(filtered_good)
-            loc = Loc(r.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
+            loc = Loc(r.get('loc')) + Loc(self.monitor.window_loc)
             return good_pass,loc.to_tuple()
         elif filtered_bad:
             r = random.choice(filtered_bad)
-            loc = Loc(r.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
+            loc = Loc(r.get('loc')) + Loc(self.monitor.window_loc)
             return bad_pass,loc.to_tuple()
         else:
-            r = random.choice(datas)
-            loc = Loc(r.get('loc')[0]) + Loc(self.monitor.window_loc) + Loc(60,self.monitor.title_height) + Loc(top_left)
+            r = random.choice(results)
+            loc = Loc(r.get('loc')) + Loc(self.monitor.window_loc)
             return normal_pass,loc.to_tuple()
 
 
