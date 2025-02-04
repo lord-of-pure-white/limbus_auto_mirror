@@ -10,19 +10,19 @@ EVENT_PRIORITY0 = ['judge','normal','fight']
 EVENT_PRIORITY1 = ['level','ego']
 
 # 罪人选择，按游戏里的顺序来填入对应序号，需要填满 
-SINNERLIST = [1,11,3,9,6,12,10,2,4,5,7,8]
+SINNERLIST = [3,4,9,10,11,12,1,2,5,6,7,8]
 
 # 商店里需要购买的ego的属性（拼音）
 BUYEGOATTR = ['liuxue']
 
 # 店铺里需要更换技能的罪人和更换方式(1是1换2，2是2换3，3是3换1)
-SKILLCHANGE = [('李箱',1),('堂吉诃德',3),('罗佳',1),('格里高尔',3),('奥提斯',1)]
+SKILLCHANGE = [('李箱',1),('堂吉诃德',3),('罗佳',1),('格里高尔',3),('良秀',3)]
 
 # 店铺操作优先级:'skill'更换技能，'ego' 购买饰品，'firm' 强化饰品(难度过大，暂时不做支持)
 SHOP_PRIORITY = ['skill','ego','firm']
 
 # 店铺刷新次数
-SHOP_REFRESH = 2
+SHOP_REFRESH = 3
 
 # 遭遇战奖励优先级，'经费ego'对应获取经费并概率获取ego，'ego'对应获取ego饰品，'经费'对应获取经费，'罪孽碎片'对应获取罪孽碎片
 GIFT_PRIORITY = ['经费ego','ego','经费','罪孽碎片']
@@ -34,10 +34,10 @@ BADCARDS = ['斩切者们','紫罗兰的正午','徒劳的怠','快车谋杀','�
 GOODCARDS = []
 
 # 选择活动卡包
-EVENT_CARD = []
+EVENT_CARD = ['event_card_lcb']
 
 # 尝试寻找优先选择的卡包时的刷新次数
-CARD_REFRESH = 0
+CARD_REFRESH = 1
 
 # 选择的星之恩惠 
 STAR_BUFFS = [1,2,7]
