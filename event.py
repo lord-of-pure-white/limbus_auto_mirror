@@ -7,7 +7,7 @@ import cv2
 import random
 import re
 from config import *
-
+import random
 class Checker:
     def __init__(self,monitor):
         self.monitor = monitor
@@ -240,6 +240,7 @@ class EventSolver(Solver):
         self.analysis_choices(datas)
         for p_list in ([self.priority0,self.priority1]):
             datas = self.sort_chose(datas,p_list)
+            datas = random.shuffle(datas)
         print(datas[0])
         r = Loc(datas[0]['loc'][0]) + Loc(top_left)
         r += Loc(self.monitor.window_loc)
