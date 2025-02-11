@@ -240,7 +240,7 @@ class EventSolver(Solver):
         self.analysis_choices(datas)
         for p_list in ([self.priority0,self.priority1]):
             datas = self.sort_chose(datas,p_list)
-            datas = random.shuffle(datas)
+            random.shuffle(datas)
         print(datas[0])
         r = Loc(datas[0]['loc'][0]) + Loc(top_left)
         r += Loc(self.monitor.window_loc)
@@ -837,6 +837,7 @@ class ResultSolver(Solver):
                 self.confirm_ego1()
             elif status == 'gift':
                 self.choose_gift()
+                time.sleep(1)
             elif status == 'net_error':
                 self.reconnect()
             elif status == 'not_result':
@@ -984,6 +985,7 @@ class CardChooseSolver(Solver):
             pass
         else:
             for _ in range(self.card_refresh):
+                time.sleep(1)
                 self.refresh_cards()
                 is_ok,loc =  self.select_card()
                 if is_ok:
