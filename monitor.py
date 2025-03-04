@@ -23,6 +23,7 @@ class WindowMonitor:
             return False
     
     def find(self,obj,range=None,**kwargs):
+        print(f'finding:{obj}')
         # if obj in self.static_location.loc_lib:
         #     return self.static_location.get_static_loc(obj)
         file_path = os.path.join(self.icons_path,'{}.png'.format(obj))

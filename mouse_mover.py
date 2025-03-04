@@ -100,7 +100,6 @@ def mouse_continuous_clicks(button="left",click_times = 10):
 
 
 def move_and_click(loc,**kwargs):
-    time.sleep(random.uniform(0.2, 0.5))
     move_mouse_smooth(loc,**kwargs)
     time.sleep(random.uniform(0.2, 0.5))
     mouse_click()

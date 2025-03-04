@@ -37,7 +37,7 @@ GOODCARDS = ['骨断']
 EVENT_CARD = []
 
 # 尝试寻找优先选择的卡包时的刷新次数
-CARD_REFRESH = 1
+CARD_REFRESH = 0
 
 # 选择的星之恩惠 
 STAR_BUFFS = [1,2,7]

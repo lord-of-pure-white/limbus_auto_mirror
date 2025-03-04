@@ -8,6 +8,27 @@ import random
 import re
 from config import *
 import random
+from functools import wraps
+from collections import defaultdict
+import json
+import os
+
+solver_use_time = defaultdict(float)
+
+def timeit(func):
+    global solver_use_time
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        self_instance = args[0]  # 获取类的实例
+        class_name = self_instance.__class__.__name__  # 获取类名
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        elapsed_time = time.time() - start_time
+        solver_use_time[class_name] += elapsed_time
+        return result
+    return wrapper
+
+
 class Checker:
     def __init__(self,monitor):
         self.monitor = monitor
@@ -15,7 +36,7 @@ class Checker:
     def check_screen(self):
         for _ in range(MAX_RETRY):
             if self.monitor.refresh():
-                self.window_status = 'live'
+                self.window_status = 'alive'
                 return True
             else:
                 time.sleep(5)
@@ -31,7 +52,16 @@ class Solver():
         # 鼠标移动到其他位置避免遮挡
         window_loc = Loc(self.monitor.window_loc) + offset
         move_mouse_smooth(window_loc.to_tuple())
-    
+    def count_time(self):
+        global solver_use_time
+        print(solver_use_time)
+        if not os.path.exists('time_count'):
+            os.mkdir('time_count')
+        with open('time_count/{}.json'.format(str(int(time.time()))),'w') as f:
+            json.dump(dict(solver_use_time),f)
+        solver_use_time = defaultdict(float)
+        return None
+
 
 class FreeFightChecker(Checker):
     def __init__(self,monitor):
@@ -103,6 +133,7 @@ class FreeFightSolver(Solver):
         move_and_click(loc_fight.to_tuple())
         # 鼠标移动到其他位置避免遮挡
         super().move_free()
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -136,7 +167,7 @@ class EventChecker(Checker):
     def is_in(self):
         return self.monitor.find('in_event')[0]
     def is_choice(self):
-        return self.monitor.find('event_choice')[0]
+        return self.monitor.find('event_choice',threshold=0.9)[0]
     def is_judge(self):
         return self.monitor.find('event_judge')[0]
     def is_continue(self):
@@ -225,7 +256,7 @@ class EventSolver(Solver):
             text = x.get('text')
             if '判定' in text:
                 info.add('judge')
-            elif '战斗胜利后' in text:
+            elif '战斗' in text:
                 info.add('fight')
             else:
                 info.add('normal')
@@ -252,6 +283,7 @@ class EventSolver(Solver):
         move_and_click(loc)
         time.sleep(1)
 
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -381,6 +413,7 @@ class RouteSolver(Solver):
         else:
             return False
 
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -405,7 +438,7 @@ class SinnerChooseChecker(Checker):
         self.status = 'start'
     def is_already_chose(self):
         d = self.monitor.ocr(range=((300,180),(1280,650)))
-        found = [x for x in d if 'SELECTED' in x.get('text')]
+        found = [x for x in d if '已选择' in x.get('text')]
         if found:
             return True
         else:
@@ -488,6 +521,7 @@ class SinnerChooseSolver(Solver):
         else:
             return False
 
+    @timeit
     def run(self):
         
         if self.not_need:
@@ -566,6 +600,7 @@ class ShopBuyEgoSolver(Solver):
             if '购买' in x.get('text'):
                 return True
         return False
+    @timeit
     def run(self):
         status = self.checker.check_status()
         ego_locs = self.get_egos_locs()
@@ -578,7 +613,7 @@ class ShopBuyEgoSolver(Solver):
                 continue
             r = self.buy_egos(loc)
             super().move_free()
-            time.sleep(0.5)
+            time.sleep(1)
             if r:
                 
                 found, loc0, _ = self.monitor.new_find('ego_get')
@@ -647,6 +682,7 @@ class ShopSkillSolver(Solver):
                 super().move_free()
 
 
+    @timeit
     def run(self):
         status = self.checker.check_status()
         if status == 'in_shop':
@@ -722,6 +758,7 @@ class ShopSolver(Solver):
         _, loc, _ = self.monitor.new_find('out_shop_confirm')
         move_and_click(loc)
         time.sleep(1.5)
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -825,6 +862,7 @@ class ResultSolver(Solver):
         move_and_click(loc)
         super().move_free()
         time.sleep(5)
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -999,6 +1037,7 @@ class CardChooseSolver(Solver):
         else:
             return True
         
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -1146,6 +1185,7 @@ class IntoMirrorSolver(Solver):
             return True
         else:
             return False
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -1223,6 +1263,7 @@ class MainSolver(Solver):
         self.retry = 0
         self.checker = MainChecker(self.monitor)
         self.need_rechoose = True
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -1298,6 +1339,7 @@ class EndSolver(Solver):
             super().move_free()
             time.sleep(4)
         return True
+    @timeit
     def run(self):
         while True:
             if self.retry > MAX_RETRY:
@@ -1306,6 +1348,7 @@ class EndSolver(Solver):
             print(status)
             if status == 'win':
                 self.win_confirm()
+                super().count_time()
                 return True
             elif status == 'lose':
                 pass
