@@ -747,8 +747,6 @@ class ShopSolver(Solver):
     def out_shop(self):
         return 
     def refresh_shop(self):
-        print('refresh')
-        time.sleep(100)
         found, loc, _ = self.monitor.find('shop_refresh')
         if not found:
             return False
