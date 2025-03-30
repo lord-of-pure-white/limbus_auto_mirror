@@ -34,6 +34,9 @@ class Checker:
         self.monitor = monitor
         self.window_status = "start"
     def check_screen(self):
+        if self.monitor.stop_flag==True:
+            self.window_status = 'dead'
+            return True
         for _ in range(MAX_RETRY):
             if self.monitor.refresh():
                 self.window_status = 'alive'
@@ -104,7 +107,7 @@ class FreeFightChecker(Checker):
                 else:
                     return 'not_battle'
             else:
-                time.sleep(2)
+                return 'dead'
         return 'dead'
 
 class FreeFightSolver(Solver):
@@ -595,7 +598,7 @@ class ShopBuyEgoSolver(Solver):
     def check_bought(self,loc):
         # 获取的坐标为标志坐标。标志坐标-窗口左上角坐标
         loc0 = Loc(loc) - Loc(self.monitor.window_loc) - (0,self.monitor.title_height)
-        data = self.monitor.ocr(range=((loc0-(50,50)).to_tuple(),(loc0+(50,50)).to_tuple()))
+        data = self.monitor.ocr(range=((loc0-(50,80)).to_tuple(),(loc0+(50,50)).to_tuple()))
         for x in data:
             if '购买' in x.get('text'):
                 return True
@@ -744,6 +747,8 @@ class ShopSolver(Solver):
     def out_shop(self):
         return 
     def refresh_shop(self):
+        print('refresh')
+        time.sleep(100)
         found, loc, _ = self.monitor.find('shop_refresh')
         if not found:
             return False
@@ -1255,8 +1260,8 @@ class MainChecker(Checker):
                 else:
                     return 'wait'
             else:
-                time.sleep(2)
-        return 'dead'
+                return 'dead'
+        
 class MainSolver(Solver):
     def __init__(self,monitor):
         super().__init__(monitor)
@@ -1379,12 +1384,32 @@ class EndChecker(Checker):
                 return 'dead'
         return 'error_process'
     
-    
+
+def run_mirror(monitor):
+    try:
+        s = MainSolver(monitor)
+        s.run()
+    except Exception as e:
+        print(e)
+    finally:
+        if monitor.stop_event is not None:
+            monitor.stop_event.set()
+            monitor.stop_done = True
+            print('运行已停止')
+
+def run_daily(monitor):
+    print('日常（后面会加入刷经验本和纽本）')
+    try:
+        s = MainSolver(monitor)
+        s.run()
+    except Exception as e:
+        print(e)
+    finally:
+        if monitor.stop_event is not None:
+            monitor.stop_event.set()
+            monitor.stop_done = True
+            print('运行已停止')
 if __name__ == '__main__':
     m = WindowMonitor()
     s = MainSolver(m)
     s.run()
-    # m = WindowMonitor()
-    # s = ShopSolver(m)
-    # s.run()
-    

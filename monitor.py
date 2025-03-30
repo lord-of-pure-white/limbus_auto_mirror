@@ -3,16 +3,26 @@ from location_compute import  match_template, Loc, match_template_all
 import os
 from ocr import img_ocr
 class WindowMonitor:
-    def __init__(self,icons_path = 'page_icons/',resolution=(1600,900),lib_file_path='resource/loc_lib.csv'):
+    def __init__(self,stop_event=None,icons_path = 'page_icons/',resolution=(1600,900),lib_file_path='resource/loc_lib.csv'):
         self.window_loc = None
         self.title_height = None
         self.screen = None
         self.icons_path = icons_path
         self.resolution = resolution
+        self.stop_flag = False
+        self.stop_event = stop_event
+        self.stop_done = False
         self.refresh()
         # self.static_location = StaticLocation(resolution,lib_file_path)
 
     def refresh(self):
+        if self.stop_event is None:
+            pass
+        elif self.stop_event.is_set():
+            self.stop_flag = True
+            return True
+        else:
+            pass
         loc,title_height = get_main_loc()
         self.window_loc,self.title_height = loc,title_height
         if self.window_loc:
