@@ -274,6 +274,7 @@ class EventSolver(Solver):
         self.analysis_choices(datas)
         for p_list in ([self.priority0,self.priority1]):
             datas = self.sort_chose(datas,p_list)
+            print(datas)
             random.shuffle(datas)
         print(datas[0])
         r = Loc(datas[0]['loc'][0]) + Loc(top_left)
@@ -441,7 +442,7 @@ class SinnerChooseChecker(Checker):
         self.status = 'start'
     def is_already_chose(self):
         d = self.monitor.ocr(range=((300,180),(1280,650)))
-        found = [x for x in d if '已选择' in x.get('text')]
+        found = [x for x in d if 'selected' in x.get('text').lower()]
         if found:
             return True
         else:
@@ -598,7 +599,7 @@ class ShopBuyEgoSolver(Solver):
     def check_bought(self,loc):
         # 获取的坐标为标志坐标。标志坐标-窗口左上角坐标
         loc0 = Loc(loc) - Loc(self.monitor.window_loc) - (0,self.monitor.title_height)
-        data = self.monitor.ocr(range=((loc0-(50,80)).to_tuple(),(loc0+(50,50)).to_tuple()))
+        data = self.monitor.ocr(range=((loc0-(50,90)).to_tuple(),(loc0+(50,50)).to_tuple()))
         for x in data:
             if '购买' in x.get('text'):
                 return True
