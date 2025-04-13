@@ -250,8 +250,8 @@ class EventSolver(Solver):
                 for x in chooses:
                     if p in x.get('info'):
                         r.append(x)
-        if r:
-            return r
+                if r:
+                    return r
         return chooses
     def analysis_choices(self,datas):
         for x in datas:
@@ -756,12 +756,16 @@ class ShopSolver(Solver):
         time.sleep(0.5)
         return True
     def quit_shop(self):
-        _, loc, _ = self.monitor.find('out_shop')
-        move_and_click(loc)
-        time.sleep(0.7)
-        _, loc, _ = self.monitor.new_find('out_shop_confirm')
-        move_and_click(loc)
-        time.sleep(1.5)
+        while True:
+            _, loc, _ = self.monitor.find('out_shop')
+            move_and_click(loc)
+            super().move_free()
+            found, loc, _ = self.monitor.new_find('out_shop_confirm')
+            if not found:
+                continue
+            move_and_click(loc)
+            time.sleep(1.5)
+            return None
     @timeit
     def run(self):
         while True:

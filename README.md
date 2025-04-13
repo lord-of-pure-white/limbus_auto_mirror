@@ -67,3 +67,9 @@ pip install -r requirements.txt
 1.bug修复，适配新的商店界面变化（技能更换识别目前看起来好像还有bug，后续修复）
 
 2.添加了ui，通过run_script.bat启动
+
+### 2.2025.4.14
+
+1.事件选择bug修复。
+
+2.适配字体改动

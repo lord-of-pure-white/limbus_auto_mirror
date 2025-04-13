@@ -27,7 +27,7 @@ def get_mouse_position():
     user32.GetCursorPos(ctypes.byref(point))
     return (point.x, point.y)
 
-def move_mouse_smooth(loc, duration=0.5,random_range=8):
+def move_mouse_smooth(loc, duration=0.5,random_range=8, jitter=3):
     """
     平滑移动鼠标到目标位置
     :param x: 目标横坐标
@@ -45,8 +45,8 @@ def move_mouse_smooth(loc, duration=0.5,random_range=8):
     dy = (y + random.randint(-random_range,random_range) - start_y) / steps
 
     for step in range(steps):
-        intermediate_x = int(start_x + dx * step)
-        intermediate_y = int(start_y + dy * step)
+        intermediate_x = int(start_x + dx * step + random.randint(-jitter, jitter))
+        intermediate_y = int(start_y + dy * step + random.randint(-jitter, jitter))
         user32.SetCursorPos(intermediate_x, intermediate_y)
         time.sleep(sleep_time)
 
@@ -110,7 +110,7 @@ def mouse_drag(loc_list):
     :param coordinate_list: 需要经过的坐标列表
     """
     if len(loc_list) < 2:
-        raise("坐标列表至少需要两个点")
+        raise ValueError("坐标列表至少需要两个点")
         
     
     # 第一步：移动到第一个坐标并按下鼠标左键
@@ -127,8 +127,3 @@ def mouse_drag(loc_list):
     # 第三步：松开鼠标左键
     ctypes.windll.user32.mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)  # 放开左键
     time.sleep(0.05)  # 等待一会儿，模拟用户松开鼠标的动作
-
-
-
-
-# TODO:这里是需要一个拖拽的方法的
