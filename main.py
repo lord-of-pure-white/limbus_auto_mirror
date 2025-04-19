@@ -80,7 +80,12 @@ class MainPanel:
             pass
         self.root.after(10, self.process_log)
 
-
+    def check_stop(self):
+        if self.monitor.stop_done:
+            print('------------已中断-----------')
+            self.reset_ui()
+        else:
+            self.root.after(10, self.check_stop)  # 让 Tkinter 继续执行，而不是 `sleep()`
 
     def start_worker(self):
 
@@ -102,8 +107,10 @@ class MainPanel:
             self.start_button.config(state=tk.DISABLED)
             self.stop_button.config(state=tk.NORMAL)
             self.task_dropdown.config(state=tk.DISABLED)
+            self.check_stop()
         else:
             print("线程已在运行中")
+
 
     def stop_worker(self):
         if self.stop_event:
@@ -111,14 +118,7 @@ class MainPanel:
             self.stop_button.config(state=tk.DISABLED)
             print("--------------停止--------------")
             print("正在中断，请等待...")
-        def check_stop():
-            if self.monitor.stop_done:
-                print('------------已中断-----------')
-                self.reset_ui()
-            else:
-                self.root.after(10, check_stop)  # 让 Tkinter 继续执行，而不是 `sleep()`
-        
-        check_stop()  # 启动检查
+        # self.check_stop()  # 启动检查
     def reset_ui(self):
         """重置 UI 控件状态"""
         self.start_button.config(state=tk.NORMAL)
