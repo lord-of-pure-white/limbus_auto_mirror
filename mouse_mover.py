@@ -104,7 +104,7 @@ def move_and_click(loc,**kwargs):
     time.sleep(random.uniform(0.2, 0.5))
     mouse_click()
 
-def mouse_drag(loc_list):
+def mouse_drag(loc_list,wait_time = 0):
     """
     实现鼠标拖拽的功能
     :param coordinate_list: 需要经过的坐标列表
@@ -115,14 +115,15 @@ def mouse_drag(loc_list):
     
     # 第一步：移动到第一个坐标并按下鼠标左键
     first_loc = loc_list[0]
-    move_mouse_smooth(first_loc)  # 移动到起始点
+    move_mouse_smooth(first_loc,0.5,2,1)  # 移动到起始点
     ctypes.windll.user32.mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)  # 按下左键
     time.sleep(0.05)  # 等待一会儿，模拟用户按下的动作
 
     # 第二步：依次移动到坐标列表中的每个坐标
     for loc in loc_list[1:]:
-        move_mouse_smooth(loc)  # 移动鼠标到下一个坐标
+        move_mouse_smooth(loc,0.5,2,1)  # 移动鼠标到下一个坐标
         time.sleep(0.05)  # 延迟，模拟平滑拖动效果
+    time.sleep(wait_time)
 
     # 第三步：松开鼠标左键
     ctypes.windll.user32.mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)  # 放开左键

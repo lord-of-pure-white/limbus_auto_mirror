@@ -416,6 +416,19 @@ class RouteSolver(Solver):
             return True
         else:
             return False
+    def move_to_center(self):
+        found, loc_now, _ = self.monitor.new_find('now_loc')
+        window_loc = Loc(self.monitor.window_loc)
+        # 相对页面的位置,
+        loc0 = Loc(loc_now) - window_loc + Loc(0,45)
+        # 理想的居中位置
+        middle_loc = Loc(800,420)
+        loc_diff = loc0 - middle_loc
+        if abs(loc_diff.loc_x) > 200 or abs(loc_diff.loc_y) > 40:
+            mouse_drag([(window_loc+middle_loc).to_tuple(),(window_loc+middle_loc-loc_diff).to_tuple()],wait_time=1.5)
+            time.sleep(1)
+        else:
+            return None
 
     @timeit
     def run(self):
@@ -427,6 +440,7 @@ class RouteSolver(Solver):
             if status == 'net_error':
                 return True
             elif status == 'on_way':
+                self.move_to_center()
                 self.chose_route()
             elif status == 'goto':
                 self.to_goto()
@@ -692,6 +706,7 @@ class ShopSkillSolver(Solver):
         if status == 'in_shop':
             top_left = (700,400)
             d = self.monitor.ocr(range=(top_left,(1450,640)))
+            print(d)
             for x in self.skill_list:
                 if x[0] in d[0].get('text'):
                     r = (Loc(d[0]['loc'][0])+Loc(d[0]['loc'][2]))*0.5 + Loc(top_left) + Loc(0,-90)
@@ -1298,6 +1313,7 @@ class MainSolver(Solver):
                 s = EndSolver(self.monitor)
             elif status == 'wait':
                 time.sleep(2)
+                ResultSolver(self.monitor).run()
                 continue
             else:
                 return False
