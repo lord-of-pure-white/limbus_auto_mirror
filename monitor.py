@@ -20,6 +20,7 @@ class WindowMonitor:
             pass
         elif self.stop_event.is_set():
             self.stop_flag = True
+            self.screen = None
             return True
         else:
             pass

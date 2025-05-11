@@ -425,8 +425,8 @@ class RouteSolver(Solver):
         middle_loc = Loc(800,420)
         loc_diff = loc0 - middle_loc
         if abs(loc_diff.loc_x) > 200 or abs(loc_diff.loc_y) > 40:
-            mouse_drag([(window_loc+middle_loc).to_tuple(),(window_loc+middle_loc-loc_diff).to_tuple()],wait_time=1.5)
-            time.sleep(1)
+            mouse_drag([(window_loc+middle_loc).to_tuple(),(window_loc+middle_loc-loc_diff).to_tuple()],wait_time=0.7)
+            time.sleep(0.5)
         else:
             return None
 
@@ -699,6 +699,8 @@ class ShopSkillSolver(Solver):
                 move_and_click(loc)
                 super().move_free()
 
+    def compare_name(self,name,name_check):
+        return sum(c1 == c2 for c1, c2 in zip(name, name_check))
 
     @timeit
     def run(self):
@@ -706,14 +708,17 @@ class ShopSkillSolver(Solver):
         if status == 'in_shop':
             top_left = (700,400)
             d = self.monitor.ocr(range=(top_left,(1450,640)))
-            print(d)
-            for x in self.skill_list:
-                if x[0] in d[0].get('text'):
+            d = [info for info in d if '替换' in info['text'] or '技能' in info['text']]
+            if d:
+                # 替换***的技能
+                sinner_name = d[0].get('text')[2:-3]
+                compare_r = [self.compare_name(sinner_name,x[0]) for x in self.skill_list]
+                max_index, max_value = max(enumerate(compare_r), key=lambda x: x[1])
+                if max_value != 0:
+                    x = self.skill_list[max_index]
                     r = (Loc(d[0]['loc'][0])+Loc(d[0]['loc'][2]))*0.5 + Loc(top_left) + Loc(0,-90)
                     r += Loc(self.monitor.window_loc)
                     return self.exchange_skill(r.to_tuple(),x)
-                else:
-                    continue
 
         
 
@@ -772,7 +777,7 @@ class ShopSolver(Solver):
         return True
     def quit_shop(self):
         while True:
-            _, loc, _ = self.monitor.find('out_shop')
+            _, loc, _ = self.monitor.new_find('out_shop')
             move_and_click(loc)
             super().move_free()
             found, loc, _ = self.monitor.new_find('out_shop_confirm')
