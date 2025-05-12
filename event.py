@@ -404,7 +404,7 @@ class RouteSolver(Solver):
                 loc_arrow = distince_list.index(min(distince_list))
                 loc0 = Loc(locs[loc_arrow]) * 2 - loc_now
                 move_and_click(loc0.to_tuple())
-                time.sleep(1)   
+                time.sleep(2)   
                 return True
         return False
     def to_goto(self):
@@ -412,7 +412,7 @@ class RouteSolver(Solver):
         loc_goto = Loc(loc_goto)
         if found:
             move_and_click(loc_goto.to_tuple())
-            time.sleep(1)
+            time.sleep(1.5)
             return True
         else:
             return False
@@ -1245,7 +1245,7 @@ class MainChecker(Checker):
         super().__init__(monitor)
         self.status = 'start'
     def in_main(self):
-        return self.monitor.find('main_screen')[0]
+        return self.monitor.find('main_screen')[0] or self.monitor.find('choose_start_ego')[0]
     def in_route(self):
         return self.monitor.find('out_fight')[0] and self.monitor.find('on_way')[0]
     def in_card_choose(self):
