@@ -40,8 +40,8 @@ class MainPanel:
         # 设置 UI
         self.root.geometry("520x340")
         self.root.minsize(520, 340)
-        self.root.minsize(520, 340)
         self.root.maxsize(800, 600)
+        self.root.bind('<Control-q>', self.stop_worker)
 
 
         # 下拉选项框（任务类型选择）
