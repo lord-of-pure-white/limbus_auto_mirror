@@ -24,7 +24,7 @@ SKILLCHANGE = [('李箱',1),('堂吉诃德',3),('罗佳',1),('格里高尔',3),(
 SHOP_PRIORITY = ['skill','ego','firm']
 
 # 店铺刷新次数
-SHOP_REFRESH = 3
+SHOP_REFRESH = 1
 
 # 遭遇战奖励优先级，'经费ego'对应获取经费并概率获取ego，'ego'对应获取ego饰品，'经费'对应获取经费，'罪孽碎片'对应获取罪孽碎片
 GIFT_PRIORITY = ['经费ego','ego','经费','罪孽碎片']
@@ -42,7 +42,7 @@ EVENT_CARD = []
 CARD_REFRESH = 0
 
 # 选择的星之恩惠 
-STAR_BUFFS = [1,2,7]
+STAR_BUFFS = [7]
 
 # 选择的初始ego
 START_EGO = ('流血',[1])
