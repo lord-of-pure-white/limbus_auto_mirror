@@ -869,6 +869,8 @@ class ResultSolver(Solver):
                 x['info'] = '经费'
             elif '碎片' in text:
                 x['info'] = '罪孽碎片'
+            elif '星芒' in text:
+                x['info'] = '星芒'
 
         for info in self.gift_priority:
             for x in datas:
