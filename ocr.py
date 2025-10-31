@@ -6,6 +6,9 @@ import logging
 import os
 
 def timer(func):
+    """
+    记录函数执行时间的装饰器
+    """
     def wrapper(*args, **kwargs):
         t1 = time.time()
         result = func(*args, **kwargs)
@@ -15,6 +18,9 @@ def timer(func):
     return wrapper
 
 def save_img(func):
+    """
+    保存图片的装饰器，用于调试
+    """
     def wrapper(*args, **kwargs):
         img = args[0]
         result = func(*args, **kwargs)

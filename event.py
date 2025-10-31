@@ -442,6 +442,7 @@ class RouteSolver(Solver):
             elif status == 'on_way':
                 self.move_to_center()
                 self.chose_route()
+                time.sleep(2)
             elif status == 'goto':
                 self.to_goto()
                 super().move_free()
@@ -784,7 +785,7 @@ class ShopSolver(Solver):
             if not found:
                 continue
             move_and_click(loc)
-            time.sleep(1.5)
+            time.sleep(3)
             return None
     @timeit
     def run(self):
@@ -867,8 +868,10 @@ class ResultSolver(Solver):
                 x['info'] = 'ego'
             elif '经费' in text:
                 x['info'] = '经费'
-            elif '碎片' in text:
+            elif '资源' in text:
                 x['info'] = '罪孽碎片'
+            elif '星芒' in text:
+                x['info'] = '星芒'
 
         for info in self.gift_priority:
             for x in datas:
@@ -1064,7 +1067,18 @@ class CardChooseSolver(Solver):
             return False
         else:
             return True
-        
+    def check_mode(self):
+        while True:
+            found,_,_ = self.monitor.new_find('card_normal')
+            if found:
+                return True
+            else:
+                found,loc,_ = self.monitor.new_find('card_hard')
+                if found:
+                    move_and_click(loc)
+                    time.sleep(2)
+                    return True
+
     @timeit
     def run(self):
         while True:
@@ -1073,6 +1087,7 @@ class CardChooseSolver(Solver):
             status = self.checker.check_status()
             print(status)
             if status == 'choosing_card':
+                self.check_mode()
                 r = self.choose_card()
                 if r:
                     return True
@@ -1112,6 +1127,8 @@ class IntoMirrorChecker(Checker):
         return self.monitor.find('into_mirror_confirm')[0]
     def is_sinner_select(self):
         return self.monitor.find('start_sinner_choose',threshold=0.9)[0] and self.monitor.find('sinner_choose_found2')[0]
+    def is_sinner_level_confirm(self):
+        return self.monitor.find('level_check',threshold=0.9)[0]
     def is_select_star_buff(self):
         return self.monitor.find('star_buff_select')[0]
     def is_confirm_star_buff(self):
@@ -1130,6 +1147,9 @@ class IntoMirrorChecker(Checker):
                     return 'in_main'
                 elif self.is_confirm():
                     return 'in_confirm'
+                elif self.is_sinner_level_confirm():
+                    print(1111111111111)
+                    return 'level_check'
                 elif self.is_sinner_select():
                     return 'select_sinner'
                 elif self.is_confirm_star_buff():
@@ -1162,6 +1182,7 @@ class IntoMirrorSolver(Solver):
     def into_select(self):
         _,loc,_ = self.monitor.find('in_main')
         move_and_click(loc)
+        super().move_free()
         time.sleep(2)
     def into_mirror(self):
         _,loc,_ = self.monitor.find('into_mirror')
@@ -1176,6 +1197,10 @@ class IntoMirrorSolver(Solver):
         time.sleep(1.5)
     def sinner_selected(self):
         _,loc,_ = self.monitor.find('selected_confirm')
+        move_and_click(loc)
+        time.sleep(1.5)
+    def sinner_level_check(self):
+        _,loc,_ = self.monitor.find('sinner_level_confirm')
         move_and_click(loc)
         time.sleep(1.5)
     def select_star_buff(self):
@@ -1228,6 +1253,8 @@ class IntoMirrorSolver(Solver):
                 self.enter_mirror()
             elif status == 'in_confirm':
                 self.confirm_into()
+            elif status == 'level_check':
+                self.sinner_level_check()
             elif status == 'select_sinner':
                 self.sinner_selected()
             elif status == 'select_star_buff':
@@ -1257,7 +1284,7 @@ class MainChecker(Checker):
     def in_fight(self):
         return self.monitor.find('start_fight')[0]
     def in_sinner_choose(self):
-        return self.monitor.find('sinner_choose_found2')[0]
+        return self.monitor.find('sinner_choose_found2')[0] and not self.monitor.find('start_sinner_choose')[0]
     def in_end(self):
         return self.monitor.find('mirror_win')[0] or self.monitor.find('fight_lose')[0]
     def check_status(self):
