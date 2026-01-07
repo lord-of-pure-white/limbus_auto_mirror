@@ -404,7 +404,7 @@ class RouteSolver(Solver):
                 loc_arrow = distince_list.index(min(distince_list))
                 loc0 = Loc(locs[loc_arrow]) * 2 - loc_now
                 move_and_click(loc0.to_tuple())
-                time.sleep(2)   
+                time.sleep(1.5)   
                 return True
         return False
     def to_goto(self):
@@ -412,7 +412,7 @@ class RouteSolver(Solver):
         loc_goto = Loc(loc_goto)
         if found:
             move_and_click(loc_goto.to_tuple())
-            time.sleep(1.5)
+            time.sleep(1)
             return True
         else:
             return False
@@ -426,7 +426,7 @@ class RouteSolver(Solver):
         loc_diff = loc0 - middle_loc
         if abs(loc_diff.loc_x) > 200 or abs(loc_diff.loc_y) > 40:
             mouse_drag([(window_loc+middle_loc).to_tuple(),(window_loc+middle_loc-loc_diff).to_tuple()],wait_time=0.7)
-            time.sleep(0.5)
+            time.sleep(0.2)
         else:
             return None
 
@@ -442,7 +442,7 @@ class RouteSolver(Solver):
             elif status == 'on_way':
                 self.move_to_center()
                 self.chose_route()
-                time.sleep(2)
+                time.sleep(0.5)
             elif status == 'goto':
                 self.to_goto()
                 super().move_free()
@@ -785,7 +785,7 @@ class ShopSolver(Solver):
             if not found:
                 continue
             move_and_click(loc)
-            time.sleep(3)
+            time.sleep(2)
             return None
     @timeit
     def run(self):
@@ -835,7 +835,7 @@ class ResultSolver(Solver):
         _,loc,_ = self.monitor.find('ego_confirm1')
         move_and_click(loc)
         super().move_free()
-        time.sleep(2)
+        time.sleep(3)
     def concat_ocr(self,datas):
         datas.sort(key=lambda x:x.get('loc')[0][0])
         datas_fixed = []
@@ -1380,9 +1380,11 @@ class EndSolver(Solver):
         _,loc,_ = self.monitor.new_find('end_mirror')
         move_and_click(loc)
         super().move_free()
+        time.sleep(1)
         _,loc,_ = self.monitor.new_find('end_mirror2')
         move_and_click(loc)
         super().move_free()
+        time.sleep(1)
         _,loc,_ = self.monitor.new_find('end_mirror3')
         move_and_click(loc)
         super().move_free()
@@ -1393,7 +1395,7 @@ class EndSolver(Solver):
                 break
             move_and_click(loc)
             super().move_free()
-            time.sleep(4)
+            time.sleep(2)
         return True
     @timeit
     def run(self):
