@@ -781,6 +781,7 @@ class ShopSolver(Solver):
             _, loc, _ = self.monitor.new_find('out_shop')
             move_and_click(loc)
             super().move_free()
+            time.sleep(1)
             found, loc, _ = self.monitor.new_find('out_shop_confirm')
             if not found:
                 continue
@@ -1384,7 +1385,7 @@ class EndSolver(Solver):
         _,loc,_ = self.monitor.new_find('end_mirror2')
         move_and_click(loc)
         super().move_free()
-        time.sleep(1)
+        time.sleep(3)
         _,loc,_ = self.monitor.new_find('end_mirror3')
         move_and_click(loc)
         super().move_free()

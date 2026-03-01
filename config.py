@@ -10,14 +10,14 @@ EVENT_PRIORITY0 = ['judge','normal','fight']
 EVENT_PRIORITY1 = ['level','ego']
 
 # 罪人选择，按游戏里的顺序来填入对应序号，需要填满 
-SINNERLIST = [1,3,4,9,11,12,2,5,6,7,8,10]
+SINNERLIST = [6,9,2,12,4,7,10,8,11,1,3,5]
 # SINNERLIST = [3,5,6,8,9,12,10,1,2,4,7,11]
 
 # 商店里需要购买的ego的属性（拼音）
-BUYEGOATTR = ['liuxue']
+BUYEGOATTR = ['polie','huxifa']
 
 # 店铺里需要更换技能的罪人和更换方式(1是1换2，2是2换3，3是3换1)
-SKILLCHANGE = [('李箱',1),('堂吉诃德',3),('罗佳',1),('格里高尔',3),('良秀',3),('奥提斯',1)]
+SKILLCHANGE = [('鸿璐',3),('罗佳',3),('浮士德',3),('格里高尔',3),('良秀',3)]
 # SKILLCHANGE = [('堂吉诃德',3),('罗佳',1),('格里高尔',3),('以实玛丽',3),('辛克莱',3)]
 
 # 店铺操作优先级:'skill'更换技能，'ego' 购买饰品，'firm' 强化饰品(难度过大，暂时不做支持)
@@ -42,10 +42,10 @@ EVENT_CARD = []
 CARD_REFRESH = 0
 
 # 选择的星之恩惠 
-STAR_BUFFS = [7]
+STAR_BUFFS = [4,7]
 
 # 选择的初始ego
-START_EGO = ('流血',[1])
+START_EGO = ('破裂',[1,2])
 
 # 屏幕检测的次数，如果没有检测到就会停下
 MAX_RETRY = 3
